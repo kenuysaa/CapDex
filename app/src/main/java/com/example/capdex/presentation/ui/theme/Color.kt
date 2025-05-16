@@ -1,4 +1,4 @@
-package com.example.capdex.ui.theme
+package com.example.capdex.presentation.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
