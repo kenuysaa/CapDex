@@ -1,16 +1,27 @@
-*.iml
-.gradle
-/local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
-.DS_Store
-/build
-/captures
-.externalNativeBuild
-.cxx
+# Android Studio
+.idea/
+.gradle/
 local.properties
-/app/google-services.json
+*.iml
+
+# Build
+/build/
+*/build/
+
+# Captures e artefatos nativos
+/captures/
+.externalNativeBuild/
+.cxx/
+
+# macOS
+.DS_Store
+
+# Google Services
+app/google-services.json
+
+# Linux executáveis
+*.out
+
+# Windows executáveis
+*.exe
+*.bat
