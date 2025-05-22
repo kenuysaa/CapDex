@@ -1,3 +1,5 @@
+val googleMapsApiKey: String = project.findProperty("googleMapsKey") as? String ?: ""
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -17,6 +19,9 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // Add the Google Maps API key to the manifest
+        manifestPlaceholders["googleMapsKey"] = googleMapsApiKey
     }
 
     buildTypes {
@@ -58,6 +63,10 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    // Google Maps
+    implementation("com.google.maps.android:maps-compose:2.15.0")
+    implementation("com.google.android.gms:play-services-maps:18.2.0")
 
     // Import the Firebase BoM
     implementation(platform("com.google.firebase:firebase-bom:33.14.0"))
