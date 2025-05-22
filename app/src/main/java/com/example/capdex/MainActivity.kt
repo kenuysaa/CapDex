@@ -7,35 +7,46 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+//import androidx.compose.material3.Text
+//import androidx.compose.runtime.collectAsState
+//import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.capdex.presentation.AuthViewModel
-import com.example.capdex.presentation.ui.theme.CapDexTheme
-import com.example.capdex.ui.cadastro.CadastroScreen
+//import androidx.lifecycle.viewmodel.compose.viewModel
+//import com.example.capdex.presentation.AuthViewModel
+//import com.example.capdex.presentation.ui.theme.CapDexTheme
+//import com.example.capdex.ui.cadastro.CadastroScreen
+//import androidx.activity.compose.setContent
+//import androidx.compose.foundation.layout.fillMaxSize
+//import androidx.compose.material3.Surface
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.MarkerState
+import com.google.maps.android.compose.rememberCameraPositionState
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            CapDexTheme {
+            MaterialTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    val authViewModel: AuthViewModel = viewModel()
-                    val isSignedIn by authViewModel.isSignedIn.collectAsState()
+                    val saoPaulo = LatLng(-23.550520, -46.633308)
+                    val cameraPositionState = rememberCameraPositionState {
+                        position = CameraPosition.fromLatLngZoom(saoPaulo, 12f)
+                    }
 
-                    if (isSignedIn) {
-                        Text("Usuário Logado! (Tela Principal)")
-                        // Navegar para a tela principal aqui
-                    } else {
-                        CadastroScreen(
-                            onNavigateToLogin = { /* TODO: Navegar para login */ },
-                            authViewModel = authViewModel
+                    GoogleMap(
+                        modifier = Modifier.fillMaxSize(),
+                        cameraPositionState = cameraPositionState
+                    ) {
+                        Marker(
+                            state = MarkerState(position = saoPaulo),
+                            title = "São Paulo"
                         )
                     }
                 }
@@ -43,20 +54,3 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-
-
-//@Composable
-//fun Greeting(name: String, modifier: Modifier = Modifier) {
-//    Text(
-//        text = "Hello $name!",
-//        modifier = modifier
-//    )
-//}
-
-//@Preview(showBackground = true)
-//@Composable
-//fun GreetingPreview() {
-//    CapDexTheme {
-//        Greeting("Android")
-//    }
-//}
