@@ -25,3 +25,4 @@ app/google-services.json
 # Windows executáveis
 *.exe
 *.bat
+desktop.ini
