@@ -1,7 +1,6 @@
 package com.example.capdex
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,10 +9,9 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.capdex.presentation.AuthViewModel
+import androidx.navigation.compose.rememberNavController
 import com.example.capdex.presentation.ui.theme.CapDexTheme
-import com.example.capdex.ui.cadastro.CadastroScreen
+import com.example.capdex.ui.navigation.AppNavGraph
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -26,12 +24,8 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    val authViewModel: AuthViewModel = hiltViewModel()
-                    CadastroScreen(
-                        authViewModel = authViewModel,
-                        onNavigateToLogin = { Log.d("Navigation", "Navigate to Login") },
-                        onRegistrationSuccess = { uid -> Log.d("Cadastro", "Sucesso no cadastro com UID: $uid") }
-                    )
+                    val navController = rememberNavController()
+                    AppNavGraph(navController = navController)
                 }
             }
         }
@@ -42,11 +36,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun DefaultPreview() {
     CapDexTheme {
-        val authViewModel: AuthViewModel = hiltViewModel()
-        CadastroScreen(
-            authViewModel = authViewModel,
-            onNavigateToLogin = { /* Não faz nada na preview */ },
-            onRegistrationSuccess = { /* Não faz nada na preview */ }
-        )
+        val navController = rememberNavController()
+        AppNavGraph(navController = navController)
     }
 }
