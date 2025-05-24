@@ -17,6 +17,7 @@ fun CadastroScreen(
     onRegistrationSuccess: (String) -> Unit
 ) {
     val uiState by authViewModel.uiState.collectAsState()
+    var selectedUserType by remember { mutableStateOf("proprietario") } // Inicia como proprietário
 
     Column(
         modifier = Modifier
@@ -26,7 +27,7 @@ fun CadastroScreen(
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            "Cadastro de Proprietário",
+            "Cadastro de Usuário",
             style = MaterialTheme.typography.headlineSmall,
             modifier = Modifier.padding(bottom = 16.dp)
         )
@@ -49,12 +50,40 @@ fun CadastroScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Button(
+                onClick = { selectedUserType = "proprietario" },
+                enabled = !uiState.isLoading,
+                modifier = Modifier.weight(1f),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = if (selectedUserType == "proprietario") MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondaryContainer
+                )
+            ) {
+                Text("Proprietário")
+            }
+            Button(
+                onClick = { selectedUserType = "comum" },
+                enabled = !uiState.isLoading,
+                modifier = Modifier.weight(1f),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = if (selectedUserType == "comum") MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondaryContainer
+                )
+            ) {
+                Text("Comum")
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
         Button(
-            onClick = { authViewModel.registerUser(userType = "proprietario") },
+            onClick = { authViewModel.registerUser(selectedUserType) },
             enabled = !uiState.isLoading,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text(if (uiState.isLoading) "Cadastrando..." else "Cadastrar como Proprietário")
+            Text(if (uiState.isLoading) "Cadastrando..." else "Cadastrar como $selectedUserType")
         }
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -71,6 +100,9 @@ fun CadastroScreen(
         uiState.successMessage?.let {
             Spacer(modifier = Modifier.height(8.dp))
             Text(it, color = MaterialTheme.colorScheme.secondary)
+            if (uiState.userUid != null) {
+                onRegistrationSuccess(uiState.userUid!!)
+            }
         }
     }
 }
