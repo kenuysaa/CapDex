@@ -17,7 +17,7 @@ fun CadastroScreen(
     onRegistrationSuccess: (String) -> Unit
 ) {
     val uiState by authViewModel.uiState.collectAsState()
-    var selectedUserType by remember { mutableStateOf("proprietario") } // Inicia como proprietário
+    var selectedUserType by remember { mutableStateOf("proprietario") }
 
     Column(
         modifier = Modifier
@@ -31,6 +31,15 @@ fun CadastroScreen(
             style = MaterialTheme.typography.headlineSmall,
             modifier = Modifier.padding(bottom = 16.dp)
         )
+
+        OutlinedTextField(
+            value = uiState.nomeCompleto, // Novo campo
+            onValueChange = { authViewModel.onNomeCompletoChanged(it) }, // Nova função no ViewModel
+            label = { Text("Nome Completo") },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
 
         OutlinedTextField(
             value = uiState.email,

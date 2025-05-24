@@ -2,21 +2,19 @@ package com.example.capdex.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.capdex.data.repository.AuthRepository
 import com.example.capdex.data.repository.UserRepository
-import com.example.capdex.domain.model.User
-import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 data class AuthUiState(
     val email: String = "",
     val password: String = "",
-    val isRegistering: Boolean = false,
+    val nomeCompleto: String = "",
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
     val successMessage: String? = null,
@@ -25,64 +23,71 @@ data class AuthUiState(
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(
+    private val authRepository: AuthRepository,
     private val userRepository: UserRepository
 ) : ViewModel() {
-    private val firebaseAuth: FirebaseAuth = FirebaseAuth.getInstance()
+
     private val _uiState = MutableStateFlow(AuthUiState())
     val uiState: StateFlow<AuthUiState> = _uiState
 
-    fun onEmailChanged(newEmail: String) {
-        _uiState.update { it.copy(email = newEmail) }
+    fun onEmailChanged(email: String) {
+        _uiState.update { it.copy(email = email) }
     }
 
-    fun onPasswordChanged(newPassword: String) {
-        _uiState.update { it.copy(password = newPassword) }
+    fun onPasswordChanged(password: String) {
+        _uiState.update { it.copy(password = password) }
     }
 
-    fun registerUser(userType: String = "comum") {
-        _uiState.update { it.copy(isLoading = true, errorMessage = null, successMessage = null) }
+    fun onNomeCompletoChanged(nomeCompleto: String) {
+        _uiState.update { it.copy(nomeCompleto = nomeCompleto) }
+    }
+
+    fun registerUser(userType: String) {
+        _uiState.update { it.copy(isLoading = true, errorMessage = null, successMessage = null, userUid = null) }
         viewModelScope.launch {
-            try {
-                val authResult = firebaseAuth.createUserWithEmailAndPassword(uiState.value.email, uiState.value.password).await()
-                val uid = authResult.user?.uid
-                if (uid != null) {
-                    val user = User(uid = uid, email = uiState.value.email, userType = userType)
-                    val saveResult = userRepository.saveUser(user)
-                    saveResult.onSuccess {
-                        _uiState.update {
-                            it.copy(isLoading = false, successMessage = "Cadastro realizado com sucesso!", userUid = uid)
-                        }
+            authRepository.createUserWithEmailAndPassword(uiState.value.email, uiState.value.password)
+                .onSuccess { authResult ->
+                    authResult.user?.let { firebaseUser ->
+                        val user = com.example.capdex.domain.model.User(
+                            uid = firebaseUser.uid,
+                            email = uiState.value.email,
+                            userType = userType,
+                            displayName = uiState.value.nomeCompleto
+                        )
+                        userRepository.saveUser(user)
+                            .onSuccess {
+                                _uiState.update { currentState -> // Renomeei 'it' para 'currentState' para clareza
+                                    currentState.copy(isLoading = false, successMessage = "Cadastro realizado com sucesso!", userUid = firebaseUser.uid)
+                                }
+                            }
+                            .onFailure { e ->
+                                _uiState.update { it.copy(isLoading = false, errorMessage = "Erro ao salvar dados do usuário: ${e.localizedMessage}") }
+                            }
                     }
-                    saveResult.onFailure { e ->
-                        // Lidar com o erro ao salvar no Firestore (talvez deslogar o usuário?)
-                        _uiState.update { it.copy(isLoading = false, errorMessage = "Erro ao salvar informações do usuário: ${e.localizedMessage}") }
-                    }
-                } else {
-                    _uiState.update { it.copy(isLoading = false, errorMessage = "Erro ao obter UID do usuário.") }
                 }
-            } catch (e: Exception) {
-                _uiState.update { it.copy(isLoading = false, errorMessage = e.localizedMessage ?: "Erro ao cadastrar.") }
-            }
+                .onFailure { e ->
+                    _uiState.update { it.copy(isLoading = false, errorMessage = e.localizedMessage) }
+                }
         }
     }
 
     fun loginUser() {
-        _uiState.update { it.copy(isLoading = true, errorMessage = null, successMessage = null) }
+        _uiState.update { it.copy(isLoading = true, errorMessage = null, successMessage = null, userUid = null) }
         viewModelScope.launch {
-            try {
-                val authResult = firebaseAuth.signInWithEmailAndPassword(uiState.value.email, uiState.value.password).await()
-                _uiState.update {
-                    it.copy(isLoading = false, successMessage = "Login realizado com sucesso! UID: ${authResult.user?.uid}", userUid = authResult.user?.uid)
+            authRepository.signInWithEmailAndPassword(uiState.value.email, uiState.value.password)
+                .onSuccess { authResult ->
+                    _uiState.update { currentState -> // Renomeei 'it' para 'currentState'
+                        currentState.copy(isLoading = false, successMessage = "Login realizado com sucesso!", userUid = authResult.user?.uid)
+                    }
                 }
-                // Aqui você buscaria as informações do usuário do Firestore para determinar o tipo
-            } catch (e: Exception) {
-                _uiState.update { it.copy(isLoading = false, errorMessage = e.localizedMessage ?: "Erro ao fazer login.") }
-            }
+                .onFailure { e ->
+                    _uiState.update { it.copy(isLoading = false, errorMessage = e.localizedMessage) }
+                }
         }
     }
 
     fun signOut() {
-        firebaseAuth.signOut()
-        _uiState.update { AuthUiState() }
+        authRepository.signOut()
+        _uiState.update { AuthUiState() } // Resetar o estado
     }
 }
