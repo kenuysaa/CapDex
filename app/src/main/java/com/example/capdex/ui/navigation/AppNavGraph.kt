@@ -6,9 +6,11 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.capdex.presentation.AuthViewModel
+import com.example.capdex.presentation.EmbarcacaoRegistrationViewModel
+import com.example.capdex.presentation.MainScreenViewModel
 import com.example.capdex.ui.cadastro.CadastroScreen
+import com.example.capdex.ui.embarcacao.EmbarcacaoRegistrationScreen
 import com.example.capdex.ui.login.LoginScreen
-import com.example.capdex.ui.map.MapPreviewScreen
 import com.example.capdex.ui.main.LogoutScreen
 import com.example.capdex.ui.main.MainScreen
 
@@ -31,10 +33,11 @@ fun AppNavGraph(navController: NavHostController) {
             )
         }
         composable(Screen.Main.route) {
-            MainScreen(navController = navController, authViewModel = authViewModel)
+            val mainScreenViewModel: MainScreenViewModel = hiltViewModel()
+            MainScreen(navController = navController, mainScreenViewModel = mainScreenViewModel)
         }
         composable(Screen.Map.route) {
-            MapPreviewScreen()
+            // Sua tela de mapa
         }
         composable(Screen.Logout.route) {
             LogoutScreen(authViewModel = authViewModel) {
@@ -42,6 +45,13 @@ fun AppNavGraph(navController: NavHostController) {
                     popUpTo(Screen.Main.route) { inclusive = true }
                 }
             }
+        }
+        composable(Screen.RegisterEmbarcacao.route) {
+            val embarcacaoRegistrationViewModel: EmbarcacaoRegistrationViewModel = hiltViewModel()
+            EmbarcacaoRegistrationScreen(
+                embarcacaoRegistrationViewModel = embarcacaoRegistrationViewModel,
+                onEmbarcacaoRegistered = { navController.navigate(Screen.Main.route) } // Volta para a tela principal após o cadastro
+            )
         }
     }
 }

@@ -6,6 +6,7 @@ sealed class Screen(val route: String) {
     object Main : Screen("main")
     object Map : Screen("map")
     object Logout : Screen("logout")
+    object RegisterEmbarcacao : Screen("register_embarcacao") // Adicionada a rota
 }
 
 sealed class MainScreenRoute(val route: String) {
