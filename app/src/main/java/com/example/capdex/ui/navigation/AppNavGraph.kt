@@ -13,6 +13,7 @@ import com.example.capdex.ui.embarcacao.EmbarcacaoRegistrationScreen
 import com.example.capdex.ui.login.LoginScreen
 import com.example.capdex.ui.main.LogoutScreen
 import com.example.capdex.ui.main.MainScreen
+import com.example.capdex.ui.proprietario.OwnerVesselsScreen
 
 @Composable
 fun AppNavGraph(navController: NavHostController) {
@@ -52,6 +53,9 @@ fun AppNavGraph(navController: NavHostController) {
                 embarcacaoRegistrationViewModel = embarcacaoRegistrationViewModel,
                 onEmbarcacaoRegistered = { navController.navigate(Screen.Main.route) } // Volta para a tela principal após o cadastro
             )
+        }
+        composable(Screen.OwnerVessels.route) {
+            OwnerVesselsScreen()
         }
     }
 }

@@ -12,7 +12,12 @@ class EmbarcacaoRepositoryImpl @Inject constructor(
         return remoteDataSource.adicionarEmbarcacao(embarcacao, proprietarioId)
     }
 
+    override fun getEmbarcacoesDoProprietario(proprietarioId: String): Flow<Result<List<Embarcacao>>> {
+        return remoteDataSource.obterEmbarcacoesDoProprietario(proprietarioId)
+    }
+
     override fun getEmbarcacoes(): Flow<Result<List<Embarcacao>>> {
-        return remoteDataSource.obterEmbarcacoes()
+        // Lógica para obter todas as embarcações, independentemente do proprietárioreturn remoteDataSource.obterEmbarcacoes()
+        return TODO("Provide the return value")
     }
 }

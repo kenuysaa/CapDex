@@ -37,6 +37,9 @@ fun MainScreen(navController: NavHostController, mainScreenViewModel: MainScreen
             Button(onClick = { navController.navigate(Screen.RegisterEmbarcacao.route) }) {
                 Text("Cadastrar Embarcação")
             }
+            Button(onClick = { navController.navigate(Screen.OwnerVessels.route) }) {
+                Text("Minhas Embarcações")
+            }
         }
 
         if (uiState.isLoading) {
